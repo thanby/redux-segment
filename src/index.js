@@ -6,9 +6,17 @@ import { extractTrackFields } from './event/track';
 import { extractAliasFields } from './event/alias';
 import { extractGroupFields } from './event/group';
 
+const ENV = typeof process !== 'undefined' && process.env.NODE_ENV || 'development';
 
 function emit(type: string, fields: Array) {
-  window.analytics && window.analytics[type](...fields);
+  try {
+    window.analytics[type](...fields);
+  } catch (error) {
+    if (ENV === 'development') {
+      console.warn(`Call to window.analytics[${type}] failed. Make sure that the anaytics.js`
+        + ` script is loaded and executed before your application code.\n`, error);
+    }
+  }
 }
 
 function createTracker(customOptions = {}) {
