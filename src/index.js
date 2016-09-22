@@ -76,12 +76,21 @@ function getEventType(spec) {
   return spec.eventType;
 }
 
-function handleSpec(next: Function, action: Object) {
-  const spec = action.meta.analytics;
+function handleIndividualSpec(spec: string | Object, action: Object) {
   const type = getEventType(spec);
   const fields = getFields(type, spec.eventPayload || {}, action.type);
 
   emit(type, fields);
+}
+
+function handleSpec(next: Function, action: Object) {
+  const spec = action.meta.analytics;
+
+  if (Array.isArray(spec)) {
+    spec.forEach(s => handleIndividualSpec(s, action));
+  } else {
+    handleIndividualSpec(spec, action);
+  }
 
   return next(action);
 }

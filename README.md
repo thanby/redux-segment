@@ -183,7 +183,7 @@ middleware so that it sees actual actions._
 
 **2. Optional, Access Third Party Redux Libraries**
 Provide an optional config object to `createTracker(customMapper)` to map third party Redux library ActionTypes to Segment EventTypes and replace out-of-the-box support (if necessary). Note that the mappings can be either simple EventTypes, or mappings to functions if access to state and action is required, that returns state information and EventType.
- 
+
 ```js
 import { EventTypes } from 'redux-segment'
 const customMapper = {
@@ -582,6 +582,40 @@ fields](https://segment.com/docs/spec/common/#structure). This can be
 used to selectively enable or disable certain integrations or set
 `anonymousId` or `userId` on an ad-hoc basis.
 
+
+### Emitting more than one event
+If you want to emit more than one analytics events/calls from a single redux
+action, you can provide an array as the value of `meta.analytics`:
+
+```js
+function buy(cart, subtotal, tax, total) {
+  return {
+    type: 'CHECKOUT',
+    payload: {
+      cart,
+      subtotal,
+      tax,
+      total,
+    },
+    meta: {
+      analytics: [
+        {
+          eventType: EventTypes.track,
+        },
+        {
+          eventType: EventTypes.track,
+          eventPayload: {
+            event: 'Checked Out',
+          },
+        },
+      ],
+    },
+  };
+}
+```
+
+This will result in two calls to `track` with different event names, but you can
+use any combination of track/identify/group etc.
 
 ## Support
 

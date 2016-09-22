@@ -253,4 +253,55 @@ test('Track - spec', t => {
 
     window.analytics = null;
   });
+
+  t.test('multiple events', st => {
+    st.plan(2);
+
+
+    window.analytics = createAnalyticsStub();
+    const EVENT_TYPE = 'CHECKOUT';
+    const FIRST_EVENT_NAME = 'Completed Order';
+    const SECOND_EVENT_NAME = 'Checked Out';
+    const action = {
+      type: EVENT_TYPE,
+      meta: {
+        analytics: [
+          {
+            eventType: EventTypes.track,
+            eventPayload: {
+              event: FIRST_EVENT_NAME,
+            },
+          },
+          {
+            eventType: EventTypes.track,
+            eventPayload: {
+              event: SECOND_EVENT_NAME,
+            },
+          },
+        ],
+      },
+    };
+    const identity = val => val;
+    const tracker = createTracker();
+    const store = compose(
+      applyMiddleware(tracker)
+    )(createStore)(identity);
+
+
+    store.dispatch(action);
+    const firstEvent = [
+      window.analytics[0] && window.analytics[0][0],
+      window.analytics[0] && window.analytics[0][1],
+    ];
+    st.deepEqual(firstEvent, ['track', FIRST_EVENT_NAME], 'passes along the first event name');
+
+    const secondEvent = [
+      window.analytics[1] && window.analytics[1][0],
+      window.analytics[1] && window.analytics[1][1],
+    ];
+    st.deepEqual(secondEvent, ['track', SECOND_EVENT_NAME], 'passes along the second event name');
+
+
+    window.analytics = null;
+  });
 });
