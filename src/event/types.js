@@ -4,6 +4,7 @@ const EventTypes = {
   track: 'track',
   alias: 'alias',
   group: 'group',
+  reset: 'reset',
 };
 
 

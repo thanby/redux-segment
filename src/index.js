@@ -63,6 +63,7 @@ function getFields(type: string, fields: Object, actionType: string) {
     [EventTypes.track]: eventFields => extractTrackFields(eventFields, actionType),
     [EventTypes.alias]: extractAliasFields,
     [EventTypes.group]: extractGroupFields,
+    [EventTypes.reset]: () => [],
   };
 
   return typeFieldHandlers[type](fields);

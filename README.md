@@ -583,6 +583,18 @@ used to selectively enable or disable certain integrations or set
 `anonymousId` or `userId` on an ad-hoc basis.
 
 
+### Reset / Logout
+
+> Calling reset will reset the id, including anonymousId, and clear
+> traits for the currently identified user and group.
+> [Docs: Reset / Logout](https://segment.com/docs/sources/website/analytics.js/#reset-logout)
+
+**Type:**
+`EventTypes.reset`
+
+**Payload Fields:**
+The reset event takes no payload fields.
+
 ### Emitting more than one event
 If you want to emit more than one analytics events/calls from a single redux
 action, you can provide an array as the value of `meta.analytics`:
