@@ -79,9 +79,13 @@ function getEventType(spec) {
 
 function handleIndividualSpec(spec: string | Object, action: Object) {
   const type = getEventType(spec);
-  const fields = getFields(type, spec.eventPayload || {}, action.type);
 
-  emit(type, fields);
+  // In case the eventType was not specified or set to `null`, ignore this individual spec.
+  if (type && type.length) {
+    const fields = getFields(type, spec.eventPayload || {}, action.type);
+
+    emit(type, fields);
+  }
 }
 
 function handleSpec(next: Function, action: Object) {
