@@ -16,7 +16,7 @@ function extractGroupFields(fields: Object) {
   const props = getGroupProperties(fields);
 
   const err = validateGroupFields(fields);
-  if (err) throw err;
+  if (err) return err;
 
   return extractFields(fields, props);
 }

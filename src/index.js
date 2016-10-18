@@ -1,3 +1,4 @@
+import { warn } from './utils';
 import EventTypes from './event/types';
 import { defaultMapper } from './event/configuration';
 import { extractIdentifyFields } from './event/identify';
@@ -6,16 +7,13 @@ import { extractTrackFields } from './event/track';
 import { extractAliasFields } from './event/alias';
 import { extractGroupFields } from './event/group';
 
-const ENV = typeof process !== 'undefined' && process.env.NODE_ENV || 'development';
 
 function emit(type: string, fields: Array) {
   try {
     window.analytics[type](...fields);
   } catch (error) {
-    if (ENV === 'development') {
-      console.warn(`Call to window.analytics[${type}] failed. Make sure that the anaytics.js`
-        + ` script is loaded and executed before your application code.\n`, error);
-    }
+    warn(`Call to window.analytics[${ type }] failed. Make sure that the anaytics.js` +
+         ` script is loaded and executed before your application code.\n`, error);
   }
 }
 
@@ -80,6 +78,8 @@ function getEventType(spec) {
 function handleIndividualSpec(spec: string | Object, action: Object) {
   const type = getEventType(spec);
   const fields = getFields(type, spec.eventPayload || {}, action.type);
+
+  if (fields instanceof Error) return warn(fields);
 
   emit(type, fields);
 }

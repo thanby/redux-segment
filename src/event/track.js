@@ -20,7 +20,7 @@ function extractTrackFields(fields: Object, actionType: string) {
   const props = getTrackProperties(fields);
 
   const err = validateTrackFields(fields, actionType);
-  if (err) throw err;
+  if (err) return err;
 
   return extractFields(fields, props, actionType);
 }
