@@ -1,6 +1,7 @@
 import test from 'tape';
 import { compose, createStore, applyMiddleware } from 'redux';
 import createAnalyticsStub from './helpers/segment-stub';
+import { warn } from './helpers/console-stub';
 import { createTracker, EventTypes } from '../src/index';
 
 
@@ -10,6 +11,8 @@ test('Alias - spec', t => {
 
 
     window.analytics = createAnalyticsStub();
+    const _oldWarn = console.warn;
+    console.warn = warn;
     const EVENT_TYPE = 'SIGN_IN';
     const explicitAction = {
       type: EVENT_TYPE,
@@ -33,13 +36,14 @@ test('Alias - spec', t => {
 
 
     const explicitEvent = () => store.dispatch(explicitAction);
-    st.throws(explicitEvent, /missing userId/, 'throws error when userId prop is missing');
+    st.throws(explicitEvent, /missing userId/, 'warns when userId prop is missing');
 
     const implicitEvent = () => store.dispatch(implicitAction);
-    st.throws(implicitEvent, /missing userId/, 'throws error when userId props is missing');
+    st.throws(implicitEvent, /missing userId/, 'warns when userId props is missing');
 
 
     window.analytics = null;
+    console.warn = _oldWarn;
   });
 
   t.test('userId', st => {

@@ -1,6 +1,7 @@
 import test from 'tape';
 import { compose, createStore, applyMiddleware } from 'redux';
 import createAnalyticsStub from './helpers/segment-stub';
+import { warn } from './helpers/console-stub';
 import { createTracker, EventTypes } from '../src/index';
 
 
@@ -10,6 +11,8 @@ test('Group - spec', t => {
 
 
     window.analytics = createAnalyticsStub();
+    const _oldWarn = console.warn;
+    console.warn = warn;
     const EVENT_TYPE = 'JOIN_TEAM';
     const explicitAction = {
       type: EVENT_TYPE,
@@ -33,13 +36,14 @@ test('Group - spec', t => {
 
 
     const explicitEvent = () => store.dispatch(explicitAction);
-    st.throws(explicitEvent, /missing groupId/, 'throws error when groupId prop is missing');
+    st.throws(explicitEvent, /missing groupId/, 'warns error when groupId prop is missing');
 
     const implicitEvent = () => store.dispatch(implicitAction);
-    st.throws(implicitEvent, /missing groupId/, 'throws error when groupId props is missing');
+    st.throws(implicitEvent, /missing groupId/, 'warms error when groupId props is missing');
 
 
     window.analytics = null;
+    console.warn = _oldWarn;
   });
 
   t.test('groupId', st => {

@@ -1,4 +1,6 @@
 import EventTypes from './types';
+
+
 const { page } = EventTypes;
 
 const defaultMapper = {

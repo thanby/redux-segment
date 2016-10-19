@@ -8,6 +8,7 @@ import { createHashHistory } from 'history';
 import { syncReduxAndRouter, routeReducer } from 'redux-simple-router';
 import { ReduxRouter, routerStateReducer, reduxReactRouter } from 'redux-router';
 import createAnalyticsStub from './helpers/segment-stub';
+import { warn } from './helpers/console-stub';
 import { createTracker, EventTypes } from '../src/index';
 
 
@@ -203,6 +204,8 @@ test('Page - spec', t => {
 
 
     window.analytics = createAnalyticsStub();
+    const _oldWarn = console.warn;
+    console.warn = warn;
     const PAGE_NAME = 'Home';
     const CAT_NAME = 'Landing';
     const action = {
@@ -250,6 +253,7 @@ test('Page - spec', t => {
 
 
     window.analytics = null;
+    console.warn = _oldWarn;
   });
 
   t.test('properties', st => {

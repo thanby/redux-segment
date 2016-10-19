@@ -18,7 +18,7 @@ function extractAliasFields(fields: Object) {
   const props = getAliasProperties(fields);
 
   const err = validateAliasFields(fields);
-  if (err) throw err;
+  if (err) return err;
 
   return extractFields(fields, props);
 }

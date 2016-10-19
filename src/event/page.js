@@ -24,7 +24,7 @@ function extractPageFields(fields: Object) {
   }
 
   const err = validatePageFields(fields);
-  if (err) throw err;
+  if (err) return err;
 
   const props = getPageProperties(fields);
 

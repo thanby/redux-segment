@@ -1,6 +1,7 @@
 import test from 'tape';
 import { compose, createStore, applyMiddleware } from 'redux';
 import createAnalyticsStub from './helpers/segment-stub';
+import { warn } from './helpers/console-stub';
 import { createTracker, EventTypes } from '../src/index';
 
 
@@ -10,6 +11,8 @@ test('Track - spec', t => {
 
 
     window.analytics = createAnalyticsStub();
+    const _oldWarn = console.warn;
+    console.warn = warn;
     const EVENT_TYPE = 'CHECKOUT';
     const explicitAction = {
       type: EVENT_TYPE,
@@ -57,6 +60,7 @@ test('Track - spec', t => {
 
 
     window.analytics = null;
+    console.warn = _oldWarn;
   });
 
   t.test('event', st => {
