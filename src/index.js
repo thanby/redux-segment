@@ -1,6 +1,6 @@
 import { warn } from './utils';
 import EventTypes from './event/types';
-import { defaultMapper } from './event/configuration';
+import { defaultMapper, defaultClient } from './event/configuration';
 import { extractIdentifyFields } from './event/identify';
 import { extractPageFields } from './event/page';
 import { extractTrackFields } from './event/track';
@@ -8,19 +8,26 @@ import { extractAliasFields } from './event/alias';
 import { extractGroupFields } from './event/group';
 
 
-function emit(type: string, fields: Array) {
-  try {
-    window.analytics[type](...fields);
-  } catch (error) {
-    warn(`Call to window.analytics[${ type }] failed. Make sure that the anaytics.js` +
-         ` script is loaded and executed before your application code.\n`, error);
+function emit(type: string, fields: Array, { client }: Object) {
+  if (typeof client[type] === 'function') {
+    client[type](...fields);
+  } else {
+    warn(`The analytics client you provided doesn't support ${ type } events.`);
   }
 }
 
 function createTracker(customOptions = {}) {
   const options = {
-    mapper: Object.assign({}, defaultMapper.mapper, customOptions.mapper)
+    mapper: Object.assign({}, defaultMapper.mapper, customOptions.mapper),
+    client: customOptions.client || defaultClient(),
   };
+
+  if (!options.client) {
+    warn('Could not find an analytics client. Provide a client to' +
+         'createTracker or make sure that the anaytics.js script' +
+         'is loaded and executed before your application code.');
+  }
+
   return store => next => action => handleAction(store.getState.bind(store), next, action, options);
 }
 
@@ -37,18 +44,18 @@ function appendAction(action: Object, analytics: Object) {
 
 function handleAction(getState: Function, next: Function, action: Object, options: Object) {
 
-  if (action.meta && action.meta.analytics) return handleSpec(next, action);
+  if (action.meta && action.meta.analytics) return handleSpec(next, action, options);
 
   if (typeof options.mapper[action.type] === 'function') {
 
     let analytics = options.mapper[action.type](getState, action);
-    return handleSpec(next, appendAction(action, analytics));
+    return handleSpec(next, appendAction(action, analytics), options);
   }
 
   if (typeof options.mapper[action.type] === 'string') {
 
     let analytics = {eventType: options.mapper[action.type]};
-    return handleSpec(next, appendAction(action, analytics));
+    return handleSpec(next, appendAction(action, analytics), options);
   }
 
   return next(action);
@@ -75,7 +82,7 @@ function getEventType(spec) {
   return spec.eventType;
 }
 
-function handleIndividualSpec(spec: string | Object, action: Object) {
+function handleIndividualSpec(spec: string | Object, action: Object, options: Object) {
   const type = getEventType(spec);
 
   // In case the eventType was not specified or set to `null`, ignore this individual spec.
@@ -84,17 +91,17 @@ function handleIndividualSpec(spec: string | Object, action: Object) {
 
     if (fields instanceof Error) return warn(fields);
 
-    emit(type, fields);
+    emit(type, fields, options);
   }
 }
 
-function handleSpec(next: Function, action: Object) {
+function handleSpec(next: Function, action: Object, options: Object) {
   const spec = action.meta.analytics;
 
   if (Array.isArray(spec)) {
-    spec.forEach(s => handleIndividualSpec(s, action));
+    spec.forEach(s => handleIndividualSpec(s, action, options));
   } else {
-    handleIndividualSpec(spec, action);
+    handleIndividualSpec(spec, action, options);
   }
 
   return next(action);
