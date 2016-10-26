@@ -24,12 +24,12 @@ function createTracker(customOptions = {}) {
   return store => next => action => handleAction(store.getState.bind(store), next, action, options);
 }
 
-function appendAction(action: Object, analytics: Object) {
+function appendAction(action: Object, analytics: Object | Array) {
 
   action.meta = Object.assign(
     {},
-    {...action.meta},
-    { analytics : { ...analytics } }
+    { ...action.meta },
+    { analytics: Array.isArray(analytics) ? analytics : { ...analytics } }
   );
 
   return action;

@@ -182,7 +182,7 @@ _Note: Make sure to include the tracker *after* thunk or promise
 middleware so that it sees actual actions._
 
 **2. Optional, Access Third Party Redux Libraries**
-Provide an optional config object to `createTracker(customMapper)` to map third party Redux library ActionTypes to Segment EventTypes and replace out-of-the-box support (if necessary). Note that the mappings can be either simple EventTypes, or mappings to functions if access to state and action is required, that returns state information and EventType.
+Provide an optional config object to `createTracker(customMapper)` to map third party Redux library ActionTypes to Segment EventTypes and replace out-of-the-box support (if necessary). Note that the mappings can be either simple EventTypes, or mappings to functions if access to state and action is required, that should return single or array of a state information and EventType object(s).
 
 ```js
 import { EventTypes } from 'redux-segment'
@@ -198,12 +198,21 @@ const customMapper = {
             text: getState().text,
         }
       }
+    },
+    'CUSTOM_LOGOUT_ACTION': (getState, action) => {
+      return [{
+        eventType: EventTypes.reset,
+      }, {
+        eventType: EventTypes.page,
+      }]
     }
   }
 }
 
 const tracker = createTracker(customMapper);
 ```
+
+
 
 
 **2. Copy the segment snippet into the header of your site**
