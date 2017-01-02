@@ -14,6 +14,12 @@ const defaultMapper = {
   },
 };
 
+const defaultClient = () => {
+  return window && window.analytics;
+};
+
+
 export {
   defaultMapper,
+  defaultClient,
 };
