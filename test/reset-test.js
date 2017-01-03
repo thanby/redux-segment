@@ -2,6 +2,7 @@ import test from 'tape';
 import { compose, createStore, applyMiddleware } from 'redux';
 import createAnalyticsStub from './helpers/segment-stub';
 import { createTracker, EventTypes } from '../src/index';
+import { root } from './helpers/env-setup';
 
 
 test('Track - spec', t => {
@@ -9,7 +10,7 @@ test('Track - spec', t => {
     st.plan(1);
 
 
-    window.analytics = createAnalyticsStub();
+    root.analytics = createAnalyticsStub();
     const EVENT_TYPE = 'LOGOUT';
     const action = {
       type: EVENT_TYPE,
@@ -28,12 +29,12 @@ test('Track - spec', t => {
 
     store.dispatch(action);
     const defaultEvent = [
-      window.analytics[0] && window.analytics[0][0],
-      window.analytics[0] && window.analytics[0][1],
+      root.analytics[0] && root.analytics[0][0],
+      root.analytics[0] && root.analytics[0][1],
     ];
     st.deepEqual(defaultEvent, ['reset', undefined], 'emits a reset event');
 
 
-    window.analytics = null;
+    root.analytics = null;
   });
 });

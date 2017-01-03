@@ -3,6 +3,7 @@ import { compose, createStore, applyMiddleware } from 'redux';
 import createAnalyticsStub from './helpers/segment-stub';
 import { warn } from './helpers/console-stub';
 import { createTracker, EventTypes } from '../src/index';
+import { root } from './helpers/env-setup';
 
 
 test('Group - spec', t => {
@@ -10,7 +11,7 @@ test('Group - spec', t => {
     st.plan(2);
 
 
-    window.analytics = createAnalyticsStub();
+    root.analytics = createAnalyticsStub();
     const _oldWarn = console.warn;
     console.warn = warn;
     const EVENT_TYPE = 'JOIN_TEAM';
@@ -42,7 +43,7 @@ test('Group - spec', t => {
     st.throws(implicitEvent, /missing groupId/, 'warms error when groupId props is missing');
 
 
-    window.analytics = null;
+    root.analytics = null;
     console.warn = _oldWarn;
   });
 
@@ -50,7 +51,7 @@ test('Group - spec', t => {
     st.plan(1);
 
 
-    window.analytics = createAnalyticsStub();
+    root.analytics = createAnalyticsStub();
     const EVENT_TYPE = 'JOIN_TEAM';
     const GROUP_ID = '0PsRtFsHB0';
     const action = {
@@ -73,20 +74,20 @@ test('Group - spec', t => {
 
     store.dispatch(action);
     const event = [
-      window.analytics[0] && window.analytics[0][0],
-      window.analytics[0] && window.analytics[0][1],
+      root.analytics[0] && root.analytics[0][0],
+      root.analytics[0] && root.analytics[0][1],
     ];
     st.deepEqual(event, ['group', GROUP_ID], 'passes along the groupId of the user');
 
 
-    window.analytics = null;
+    root.analytics = null;
   });
 
   t.test('traits', st => {
     st.plan(1);
 
 
-    window.analytics = createAnalyticsStub();
+    root.analytics = createAnalyticsStub();
     const EVENT_TYPE = 'JOIN_TEAM';
     const GROUP_ID = '0PsRtFsHB0';
     const TRAITS = {
@@ -116,21 +117,21 @@ test('Group - spec', t => {
 
     store.dispatch(action);
     const event = [
-      window.analytics[0] && window.analytics[0][0],
-      window.analytics[0] && window.analytics[0][1],
-      window.analytics[0] && window.analytics[0][2],
+      root.analytics[0] && root.analytics[0][0],
+      root.analytics[0] && root.analytics[0][1],
+      root.analytics[0] && root.analytics[0][2],
     ];
     st.deepEqual(event, ['group', GROUP_ID, TRAITS], 'passes along the traits of the group');
 
 
-    window.analytics = null;
+    root.analytics = null;
   });
 
   t.test('options', st => {
     st.plan(2);
 
 
-    window.analytics = createAnalyticsStub();
+    root.analytics = createAnalyticsStub();
     const EVENT_TYPE = 'JOIN_TEAM';
     const GROUP_ID = '0PsRtFsHB0';
     const TRAITS = {
@@ -178,23 +179,23 @@ test('Group - spec', t => {
 
     store.dispatch(action);
     const event = [
-      window.analytics[0] && window.analytics[0][0],
-      window.analytics[0] && window.analytics[0][1],
-      window.analytics[0] && window.analytics[0][2],
-      window.analytics[0] && window.analytics[0][3],
+      root.analytics[0] && root.analytics[0][0],
+      root.analytics[0] && root.analytics[0][1],
+      root.analytics[0] && root.analytics[0][2],
+      root.analytics[0] && root.analytics[0][3],
     ];
     st.deepEqual(event, ['group', GROUP_ID, TRAITS, OPTIONS], 'passes along the options of the group event');
 
     store.dispatch(noTraitsAction);
     const noTraitsEvent = [
-      window.analytics[1] && window.analytics[1][0],
-      window.analytics[1] && window.analytics[1][1],
-      window.analytics[1] && window.analytics[1][2],
-      window.analytics[1] && window.analytics[1][3],
+      root.analytics[1] && root.analytics[1][0],
+      root.analytics[1] && root.analytics[1][1],
+      root.analytics[1] && root.analytics[1][2],
+      root.analytics[1] && root.analytics[1][3],
     ];
     st.deepEqual(noTraitsEvent, ['group', GROUP_ID, {}, OPTIONS], 'passes along the options of the group event when no traits are provided');
 
 
-    window.analytics = null;
+    root.analytics = null;
   });
 });

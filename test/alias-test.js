@@ -3,6 +3,7 @@ import { compose, createStore, applyMiddleware } from 'redux';
 import createAnalyticsStub from './helpers/segment-stub';
 import { warn } from './helpers/console-stub';
 import { createTracker, EventTypes } from '../src/index';
+import { root } from './helpers/env-setup';
 
 
 test('Alias - spec', t => {
@@ -10,7 +11,7 @@ test('Alias - spec', t => {
     st.plan(2);
 
 
-    window.analytics = createAnalyticsStub();
+    root.analytics = createAnalyticsStub();
     const _oldWarn = console.warn;
     console.warn = warn;
     const EVENT_TYPE = 'SIGN_IN';
@@ -42,7 +43,7 @@ test('Alias - spec', t => {
     st.throws(implicitEvent, /missing userId/, 'warns when userId props is missing');
 
 
-    window.analytics = null;
+    root.analytics = null;
     console.warn = _oldWarn;
   });
 
@@ -50,7 +51,7 @@ test('Alias - spec', t => {
     st.plan(1);
 
 
-    window.analytics = createAnalyticsStub();
+    root.analytics = createAnalyticsStub();
     const USER_ID = '507f191e810c19729de860ea';
     const EMAIL = 'test@example.org';
     const PASSWORD = 'supersecretssh!';
@@ -76,20 +77,20 @@ test('Alias - spec', t => {
 
     store.dispatch(action);
     const event = [
-      window.analytics[0] && window.analytics[0][0],
-      window.analytics[0] && window.analytics[0][1],
+      root.analytics[0] && root.analytics[0][0],
+      root.analytics[0] && root.analytics[0][1],
     ];
     st.deepEqual(event, ['alias', USER_ID], 'passes along the new userId of the user');
 
 
-    window.analytics = null;
+    root.analytics = null;
   });
 
   t.test('previousId', st => {
     st.plan(1);
 
 
-    window.analytics = createAnalyticsStub();
+    root.analytics = createAnalyticsStub();
     const USER_ID = '507f191e810c19729de860ea';
     const PREVIOUS_ID = '019mr8mf4r';
     const EMAIL = 'test@example.org';
@@ -117,21 +118,21 @@ test('Alias - spec', t => {
 
     store.dispatch(action);
     const event = [
-      window.analytics[0] && window.analytics[0][0],
-      window.analytics[0] && window.analytics[0][1],
-      window.analytics[0] && window.analytics[0][2],
+      root.analytics[0] && root.analytics[0][0],
+      root.analytics[0] && root.analytics[0][1],
+      root.analytics[0] && root.analytics[0][2],
     ];
     st.deepEqual(event, ['alias', USER_ID, PREVIOUS_ID], 'passes along the previousId of the user');
 
 
-    window.analytics = null;
+    root.analytics = null;
   });
 
   t.test('options', st => {
     st.plan(2);
 
 
-    window.analytics = createAnalyticsStub();
+    root.analytics = createAnalyticsStub();
     const USER_ID = '507f191e810c19729de860ea';
     const PREVIOUS_ID = '019mr8mf4r';
     const EMAIL = 'test@example.org';
@@ -179,22 +180,22 @@ test('Alias - spec', t => {
 
     store.dispatch(action);
     const event = [
-      window.analytics[0] && window.analytics[0][0],
-      window.analytics[0] && window.analytics[0][1],
-      window.analytics[0] && window.analytics[0][2],
-      window.analytics[0] && window.analytics[0][3],
+      root.analytics[0] && root.analytics[0][0],
+      root.analytics[0] && root.analytics[0][1],
+      root.analytics[0] && root.analytics[0][2],
+      root.analytics[0] && root.analytics[0][3],
     ];
     st.deepEqual(event, ['alias', USER_ID, PREVIOUS_ID, OPTIONS], 'passes along the options of the alias event');
 
     store.dispatch(noPreviousIdAction);
     const noPreviousIdEvent = [
-      window.analytics[1] && window.analytics[1][0],
-      window.analytics[1] && window.analytics[1][1],
-      window.analytics[1] && window.analytics[1][2],
+      root.analytics[1] && root.analytics[1][0],
+      root.analytics[1] && root.analytics[1][1],
+      root.analytics[1] && root.analytics[1][2],
     ];
     st.deepEqual(noPreviousIdEvent, ['alias', USER_ID, OPTIONS], 'passes along the options of the alias event when no previousId is provided');
 
 
-    window.analytics = null;
+    root.analytics = null;
   });
 });
