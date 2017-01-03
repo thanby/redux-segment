@@ -17,7 +17,7 @@ const defaultMapper = {
 const defaultClient = () => {
   const root = (typeof self === 'object' && self.self === self && self) ||
                (typeof global === 'object' && global.global === global && global) ||
-               this
+               this;
 
   return root.analytics;
 };
