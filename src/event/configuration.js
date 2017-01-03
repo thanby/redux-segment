@@ -15,7 +15,11 @@ const defaultMapper = {
 };
 
 const defaultClient = () => {
-  return window && window.analytics;
+  const root = (typeof self === 'object' && self.self === self && self) ||
+               (typeof global === 'object' && global.global === global && global) ||
+               this;
+
+  return root.analytics;
 };
 
 

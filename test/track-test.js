@@ -3,6 +3,7 @@ import { compose, createStore, applyMiddleware } from 'redux';
 import createAnalyticsStub from './helpers/segment-stub';
 import { warn } from './helpers/console-stub';
 import { createTracker, EventTypes } from '../src/index';
+import { root } from './helpers/env-setup';
 
 
 test('Track - spec', t => {
@@ -10,7 +11,7 @@ test('Track - spec', t => {
     st.plan(3);
 
 
-    window.analytics = createAnalyticsStub();
+    root.analytics = createAnalyticsStub();
     const _oldWarn = console.warn;
     console.warn = warn;
     const EVENT_TYPE = 'CHECKOUT';
@@ -43,15 +44,15 @@ test('Track - spec', t => {
 
     store.dispatch(explicitAction);
     const defaultExplicitEvent = [
-      window.analytics[0] && window.analytics[0][0],
-      window.analytics[0] && window.analytics[0][1],
+      root.analytics[0] && root.analytics[0][0],
+      root.analytics[0] && root.analytics[0][1],
     ];
     st.deepEqual(defaultExplicitEvent, ['track', EVENT_TYPE], 'emits a track event with an inferred event name on explicit actions');
 
     store.dispatch(implicitAction);
     const defaultImplicitEvent = [
-      window.analytics[1] && window.analytics[1][0],
-      window.analytics[1] && window.analytics[1][1],
+      root.analytics[1] && root.analytics[1][0],
+      root.analytics[1] && root.analytics[1][1],
     ];
     st.deepEqual(defaultImplicitEvent, ['track', EVENT_TYPE], 'emits a track event with an inferred event on implicit actions');
 
@@ -59,7 +60,7 @@ test('Track - spec', t => {
     st.throws(invalidAction, /missing event/, 'throws error when event prop is missing and cannot be inferred');
 
 
-    window.analytics = null;
+    root.analytics = null;
     console.warn = _oldWarn;
   });
 
@@ -67,7 +68,7 @@ test('Track - spec', t => {
     st.plan(1);
 
 
-    window.analytics = createAnalyticsStub();
+    root.analytics = createAnalyticsStub();
     const EVENT_TYPE = 'CHECKOUT';
     const EVENT_NAME = 'Completed Order';
     const action = {
@@ -90,20 +91,20 @@ test('Track - spec', t => {
 
     store.dispatch(action);
     const event = [
-      window.analytics[0] && window.analytics[0][0],
-      window.analytics[0] && window.analytics[0][1],
+      root.analytics[0] && root.analytics[0][0],
+      root.analytics[0] && root.analytics[0][1],
     ];
     st.deepEqual(event, ['track', EVENT_NAME], 'passes along the event name when the event name is explicit');
 
 
-    window.analytics = null;
+    root.analytics = null;
   });
 
   t.test('properties', st => {
     st.plan(1);
 
 
-    window.analytics = createAnalyticsStub();
+    root.analytics = createAnalyticsStub();
     const EVENT_TYPE = 'CHECKOUT';
     const EVENT_NAME = 'Completed Order';
     const PROPERTIES = {
@@ -155,21 +156,21 @@ test('Track - spec', t => {
 
     store.dispatch(action);
     const event = [
-      window.analytics[0] && window.analytics[0][0],
-      window.analytics[0] && window.analytics[0][1],
-      window.analytics[0] && window.analytics[0][2],
+      root.analytics[0] && root.analytics[0][0],
+      root.analytics[0] && root.analytics[0][1],
+      root.analytics[0] && root.analytics[0][2],
     ];
     st.deepEqual(event, ['track', EVENT_NAME, PROPERTIES], 'passes along the properties of the event');
 
 
-    window.analytics = null;
+    root.analytics = null;
   });
 
   t.test('options', st => {
     st.plan(2);
 
 
-    window.analytics = createAnalyticsStub();
+    root.analytics = createAnalyticsStub();
     const EVENT_TYPE = 'CHECKOUT';
     const EVENT_NAME = 'Completed Order';
     const PROPERTIES = {
@@ -239,30 +240,30 @@ test('Track - spec', t => {
 
     store.dispatch(action);
     const event = [
-      window.analytics[0] && window.analytics[0][0],
-      window.analytics[0] && window.analytics[0][1],
-      window.analytics[0] && window.analytics[0][2],
-      window.analytics[0] && window.analytics[0][3],
+      root.analytics[0] && root.analytics[0][0],
+      root.analytics[0] && root.analytics[0][1],
+      root.analytics[0] && root.analytics[0][2],
+      root.analytics[0] && root.analytics[0][3],
     ];
     st.deepEqual(event, ['track', EVENT_NAME, PROPERTIES, OPTIONS], 'passes along the options of the event');
 
     store.dispatch(noPropertiesAction);
     const noPropertiesEvent = [
-      window.analytics[1] && window.analytics[1][0],
-      window.analytics[1] && window.analytics[1][1],
-      window.analytics[1] && window.analytics[1][2],
+      root.analytics[1] && root.analytics[1][0],
+      root.analytics[1] && root.analytics[1][1],
+      root.analytics[1] && root.analytics[1][2],
     ];
     st.deepEqual(noPropertiesEvent, ['track', EVENT_NAME, OPTIONS], 'passes along the options of the event when properties are not present');
 
 
-    window.analytics = null;
+    root.analytics = null;
   });
 
   t.test('multiple events', st => {
     st.plan(2);
 
 
-    window.analytics = createAnalyticsStub();
+    root.analytics = createAnalyticsStub();
     const EVENT_TYPE = 'CHECKOUT';
     const FIRST_EVENT_NAME = 'Completed Order';
     const SECOND_EVENT_NAME = 'Checked Out';
@@ -294,18 +295,18 @@ test('Track - spec', t => {
 
     store.dispatch(action);
     const firstEvent = [
-      window.analytics[0] && window.analytics[0][0],
-      window.analytics[0] && window.analytics[0][1],
+      root.analytics[0] && root.analytics[0][0],
+      root.analytics[0] && root.analytics[0][1],
     ];
     st.deepEqual(firstEvent, ['track', FIRST_EVENT_NAME], 'passes along the first event name');
 
     const secondEvent = [
-      window.analytics[1] && window.analytics[1][0],
-      window.analytics[1] && window.analytics[1][1],
+      root.analytics[1] && root.analytics[1][0],
+      root.analytics[1] && root.analytics[1][1],
     ];
     st.deepEqual(secondEvent, ['track', SECOND_EVENT_NAME], 'passes along the second event name');
 
 
-    window.analytics = null;
+    root.analytics = null;
   });
 });
