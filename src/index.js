@@ -9,8 +9,10 @@ import { extractGroupFields } from './event/group';
 
 
 function emit(type: string, fields: Array, { client }: Object) {
-  if (typeof client[type] === 'function') {
-    client[type](...fields);
+  const currentClient = client();
+
+  if (typeof currentClient[type] === 'function') {
+    currentClient[type](...fields);
   } else {
     warn(`The analytics client you provided doesn't support ${ type } events.`);
   }
@@ -19,7 +21,7 @@ function emit(type: string, fields: Array, { client }: Object) {
 function createTracker(customOptions = {}) {
   const options = {
     mapper: { ...defaultMapper.mapper, ...customOptions.mapper },
-    client: customOptions.client || defaultClient(),
+    client: customOptions.client ? () => customOptions.client : defaultClient,
   };
 
   if (!options.client) {
