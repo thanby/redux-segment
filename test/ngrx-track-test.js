@@ -1,14 +1,14 @@
 import test from 'tape';
-import { compose, createStore, applyMiddleware } from 'redux';
+import { ReflectiveInjector } from '@angular/core';
+import { Store, StoreModule } from '@ngrx/store';
 import createAnalyticsStub from './helpers/segment-stub';
 import { warn } from './helpers/console-stub';
-import { createTracker, EventTypes } from '../src/index';
+import { createMetaReducer, EventTypes } from '../src/index';
 import { root } from './helpers/env-setup';
 
-test('Track - spec', t => {
+test('ngrx Track - spec', t => {
   t.test('default', st => {
     st.plan(3);
-
 
     root.analytics = createAnalyticsStub();
     const _oldWarn = console.warn;
@@ -34,12 +34,15 @@ test('Track - spec', t => {
         analytics: EventTypes.track,
       },
     };
-    const identity = val => val;
-    const tracker = createTracker();
-    const store = compose(
-      applyMiddleware(tracker)
-    )(createStore)(identity);
 
+    const metaReducer = createMetaReducer();
+    const reducer = (state = {}) => state; // just a dummy reducer
+
+    const injector = ReflectiveInjector.resolveAndCreate([
+      StoreModule.provideStore(metaReducer(reducer), {}).providers,
+    ]);
+
+    const store = injector.get(Store);
 
     store.dispatch(explicitAction);
     const defaultExplicitEvent = [
@@ -81,12 +84,15 @@ test('Track - spec', t => {
         },
       },
     };
-    const identity = val => val;
-    const tracker = createTracker();
-    const store = compose(
-      applyMiddleware(tracker)
-    )(createStore)(identity);
 
+    const metaReducer = createMetaReducer();
+    const reducer = (state = {}) => state; // just a dummy reducer
+
+    const injector = ReflectiveInjector.resolveAndCreate([
+      StoreModule.provideStore(metaReducer(reducer), {}).providers,
+    ]);
+
+    const store = injector.get(Store);
 
     store.dispatch(action);
     const event = [
@@ -146,12 +152,15 @@ test('Track - spec', t => {
         },
       },
     };
-    const identity = val => val;
-    const tracker = createTracker();
-    const store = compose(
-      applyMiddleware(tracker)
-    )(createStore)(identity);
 
+    const metaReducer = createMetaReducer();
+    const reducer = (state = {}) => state; // just a dummy reducer
+
+    const injector = ReflectiveInjector.resolveAndCreate([
+      StoreModule.provideStore(metaReducer(reducer), {}).providers,
+    ]);
+
+    const store = injector.get(Store);
 
     store.dispatch(action);
     const event = [
@@ -230,12 +239,15 @@ test('Track - spec', t => {
         },
       },
     };
-    const identity = val => val;
-    const tracker = createTracker();
-    const store = compose(
-      applyMiddleware(tracker)
-    )(createStore)(identity);
 
+    const metaReducer = createMetaReducer();
+    const reducer = (state = {}) => state; // just a dummy reducer
+
+    const injector = ReflectiveInjector.resolveAndCreate([
+      StoreModule.provideStore(metaReducer(reducer), {}).providers,
+    ]);
+
+    const store = injector.get(Store);
 
     store.dispatch(action);
     const event = [
@@ -285,12 +297,15 @@ test('Track - spec', t => {
         ],
       },
     };
-    const identity = val => val;
-    const tracker = createTracker();
-    const store = compose(
-      applyMiddleware(tracker)
-    )(createStore)(identity);
 
+    const metaReducer = createMetaReducer();
+    const reducer = (state = {}) => state; // just a dummy reducer
+
+    const injector = ReflectiveInjector.resolveAndCreate([
+      StoreModule.provideStore(metaReducer(reducer), {}).providers,
+    ]);
+
+    const store = injector.get(Store);
 
     store.dispatch(action);
     const firstEvent = [

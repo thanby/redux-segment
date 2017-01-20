@@ -33,6 +33,54 @@ function createTracker(customOptions = {}) {
   return store => next => action => handleAction(store.getState.bind(store), next, action, options);
 }
 
+function createMetaReducer(customOptions = {}) {
+  const options = {
+    mapper: { ...defaultMapper.mapper, ...customOptions.mapper },
+    client: customOptions.client ? () => customOptions.client : defaultClient,
+  };
+
+  if (!options.client) {
+    warn('Could not find an analytics client. Provide a client to' +
+         'createTracker or make sure that the anaytics.js script' +
+         'is loaded and executed before your application code.');
+  }
+
+  return function(reducer) {
+    return function (prevState, action) {
+
+      if (action.meta && action.meta.analytics) {
+        return handleReducerSpec(reducer, prevState, action, options);
+      }
+
+      if (typeof options.mapper[action.type] === 'function') {
+        const getState = ()=> prevState;
+        let analytics = options.mapper[action.type](getState, action);
+
+        return handleReducerSpec(reducer, prevState, appendAction(action, analytics), options);
+      }
+
+      if (typeof options.mapper[action.type] === 'string') {
+        let analytics = {eventType: options.mapper[action.type]};
+        return handleReducerSpec(reducer, prevState, appendAction(action, analytics), options);
+      }
+
+      return reducer(prevState, action);
+    };
+  };
+}
+
+function handleReducerSpec(reducer: Function, prevState: Object, action: Object, options: Object) {
+  const spec = action.meta.analytics;
+
+  if (Array.isArray(spec)) {
+    spec.forEach(s => handleIndividualSpec(s, action, options));
+  } else {
+    handleIndividualSpec(spec, action, options);
+  }
+
+  return reducer(prevState, action);
+}
+
 function appendAction(action: Object, analytics: Object | Array) {
 
   action.meta = {
@@ -45,7 +93,9 @@ function appendAction(action: Object, analytics: Object | Array) {
 
 function handleAction(getState: Function, next: Function, action: Object, options: Object) {
 
-  if (action.meta && action.meta.analytics) return handleSpec(next, action, options);
+  if (action.meta && action.meta.analytics) {
+    return handleSpec(next, action, options);
+  }
 
   if (typeof options.mapper[action.type] === 'function') {
 
@@ -111,5 +161,6 @@ function handleSpec(next: Function, action: Object, options: Object) {
 
 export {
   createTracker,
+  createMetaReducer,
   EventTypes,
 };
