@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rangle/redux-segment.git"
+    "url": "git+https://github.com/thanby/redux-segment.git"
   },
   "keywords": [
     "redux",
